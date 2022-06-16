@@ -1,5 +1,11 @@
 #include "shell.h"
-
+/**
+ * main - Short description, single line
+ * @ac: number of args
+ * @av: args
+ * @env: current enviroment
+ * Return: Description of the returned value
+ */
 int main(int argc __attribute__((unused)), char **argv)
 {
 	appData_t *appData = NULL;

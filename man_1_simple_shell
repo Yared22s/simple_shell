@@ -1,81 +1,127 @@
-.TH man "1 June 2022" "simple_shell man page"
+.\" Manpage for SSH
+
+.TH SSH 1 "1 June 2022" "1.0" "SSH man page"
 
 .SH NAME
-simple_shell - takes command from user input into prompt 
-and does what the user need to do
+    ssh - interface to the Unix system kernel
 
-.SH SYNONPSIS
-.B simple_shell 
-[command_string | file] [options]
+.SH SYNOPSIS
+    $ [command] [-flags ]
 
 .SH DESCRIPTION
-.B simple_shell 
-is a command language interpreter 
-that executes commands read from the standard input or from a file.
+     SSH provides you with an interface to the system kernel.
+     It gathers input from the user and  executes  programs  based on
+     that input. When a program  finishes executing, it displays
+     that command's output followed by a new prompt.
 
-.SH ARGUMENTS
-If arguments remain after option processing the first argument 
-is assumed to be the name of a file containing shell commands.
-simple_shell reads and executes commands from this file, then exit.
-simple_shell exit status is the exit status of the last command executed
- in the script. If not commands are executed, the exit status is '\n'.
-The executed files are always found in the PATH.
+.SH PROMPT
+     SSH provides the user a command prompt where the user can 
+     type commands and execute them by pressing newline, ssh 
+     takes the user input and compares it with a couple of builtins
+     if they are equal ssh proceeds to execute these functions otherwise
+     ssh begins to split the line entered by the user into words separated
+     by spaces and then looks for the adequate path for it in the file system
+     if it matches any executable its passed to the system call execve.
 
-.SH DEFINITIONS
-The following definitions are used throughout the rest of this document.
-.P
-.B blank  
-A space or a tab.
-.P
-.B word
-A sequence of characters considered as a single unit by the simple_shell.
-also known as 
-.B token.
-.P
-.B name
-A word consisting only of alphanumeric characters and underscores,
-and beginning with an alphabetic character or an underscore.
-Also referred to as an 
-.B identifier.
 
-.SH SIMPLE_SHELL GRAMMAR
-.B Simple Commands
-A simple command is a sequence of optional variable assignments followed by
-blank-separated words and redirections, and terminated by a control operator.
-The first word specifies the command to be executed, and is passed as
-argument zero.  The remaining words are passed as arguments to the invoked
-command.
+.SH OPTIONS
 
-.SH COMMAND EXECUTION
-After a command has been split into words, if it results in a simple
-command and an optional list of arguments, the following actions are taken.
+Built-ins
 
-.SH EXAMPLES
-.br
-ls /directory/directory
-.br
-cd directory/
-.br
-cd ../..
-.br
-exit(0);
-.br
-Ctrl+D
-.br
+     env
+     Prints the current environment
 
-.B OUTPUT
-print file and directories in the wanted directory.
-.br
-goes into the wanted directory.
-.br
-goes backward of two directories.
-.br
-exit the program and print 0.
-.br
-exit program.
+     exit [x]
+     Causes the shell to exit with the exit status  specified by
+     x. If x is omitted then the exit status is that of the last
+     command executed. 
+
+     history
+     Print the history contained in a file named .simple_shell_history
+     and also the commands ran by the current user.
+
+Examples of Commands
+
+     pwd
+     Prints the name of the current directory. man pwd for more info
+
+     ls
+     Lists the files in the current working directory. man ls for more
+     info.
+
+     echo
+     Displays a string to standard output. man echo for more info.
+
+     sh
+     A shell program written by Ken Thompson. man sh for more info.
+
+.SH SEE ALSO
+    sh(1),  csh(1),  environ(7),  execve(2), exit(3), getline(3),
+    kill(2), malloc(3), perror(3), signal(2), strtok(3), wait(2),
+    _exit(2), isatty(3).
+
+.SH EXAMPLE CODE
+
+From Main Function:
+
+
+
+#include "holberton.h"
+
+int main(int ac, char **av, char **env)
+{
+int bytesRead, i, x = 0;
+size_t buffsize;
+char *buffer = NULL, **tokens, **commands;
+h_t *head = NULL;
+(void)ac;
+
+    signal(SIGINT, siggy);
+    while (1)
+    {
+    if (isatty(STDIN_FILENO))
+    _puts("$ ");
+
+    bytesRead = getline(&buffer, &buffsize, stdin);
+    if (bytesRead == -1)
+        break;
+
+    x = berautix() - 1;
+    make_history(buffer, &head, x);
+
+    buffer[bytesRead - 1] = '\0';
+    if (*buffer == '\0')
+    continue;
+
+    if (isbuiltin(buffer, env, &head) == 3 ||
+    isbuiltin(buffer, env, &head) == 1)
+    continue;
+
+    if (isbuiltin(buffer, env, &head) == 2)
+    {
+    free(buffer);
+    exit(1);
+    }
+
+    commands = make_command(buffer, ";");
+
+    for (i = 0 ; commands[i] ; i++)
+    {
+    tokens = make_command(commands[i], " ");
+    exec_command(av, tokens, buffer, env, commands);
+    if (tokens)
+    free(tokens);
+    }
+
+    free(commands);
+    }
+free(buffer);
+return (0);
+}
+
+
+.SH BUGS
+     Not discovered yet
 
 .SH AUTHORS
-.br
-.B Alemsyehu Alemayehu
-.br
-.B Yared S. Abate
+     Written by Natinael alemayehu Alemayehu and Yared Abate
